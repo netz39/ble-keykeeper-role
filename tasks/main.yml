@@ -1,0 +1,56 @@
+---
+- name: Create ble_keykeeper_dir if it does not exist
+  ansible.builtin.file:
+    path: "{{ble_keykeeper_dir}}"
+    state: directory
+    mode: '0755'
+
+- name: Copy file with owner and permissions
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ble_keykeeper_dir}}"
+    owner: pi
+    group: pi
+    mode: '0644'
+  with_items:
+    - "ble_helpers.py"
+    - "requirements.txt"
+    - "coin.hex"
+
+- name: Copy gen_coin executable
+  ansible.builtin.copy:
+    src: "ble_gen_coin.py"
+    dest: "{{ble_keykeeper_dir}}"
+    owner: pi
+    group: pi
+    mode: '0744'
+
+- name: Template main executable
+  ansible.builtin.template:
+    src: ble_keykeeper.py
+    dest: "{{ble_keykeeper_dir}}"
+    owner: pi
+    group: pi
+    mode: '0744'
+
+- name: Template service file
+  ansible.builtin.template:
+    src: ble-keykeeper.service
+    dest: /etc/systemd/system
+    owner: pi
+    group: pi
+    mode: '0644'
+
+- name: Install python requirements
+  pip:
+    requirements: "{{ble_keykeeper_dir}}/requirements.txt"
+
+- name: Just force systemd to reread configs
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Restart ble-keykeeper service
+  ansible.builtin.systemd:
+    state: restarted
+    name: ble-keykeeper
+    enabled: yes

@@ -1,0 +1,17 @@
+[Unit]
+Description=BLE Keykeeper Daemon
+After=network-online.target
+Wants=network-online.target systemd-networkd-wait-online.service
+
+StartLimitIntervalSec=500
+StartLimitBurst=5
+
+[Service]
+Restart=on-failure
+RestartSec=3s
+User=pi
+WorkingDirectory={{ble_keykeeper_dir}}
+ExecStart={{ble_keykeeper_dir}}/ble_keykeeper.py
+
+[Install]
+WantedBy=multi-user.target

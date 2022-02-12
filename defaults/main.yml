@@ -1,0 +1,3 @@
+---
+door_open_command: '/home/pi/door-open.sh'
+ble_keykeeper_dir: '/home/pi/ble_keykeeper'
