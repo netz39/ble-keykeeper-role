@@ -5,17 +5,17 @@
     state: directory
     mode: '0755'
 
-- name: Ensure group pi exists
+- name: Ensure group exists
   ansible.builtin.group:
-    name: pi
+    name: "{{ ble_keykeeper_group }}"
     state: present
 
 - name: Copy files
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: "{{ble_keykeeper_dir}}"
-    owner: pi
-    group: pi
+    owner: "{{ ble_keykeeper_user }}"
+    group: "{{ ble_keykeeper_group }}"
     mode: '0644'
   with_items:
     - "ble_helpers.py"
@@ -34,24 +34,24 @@
   ansible.builtin.copy:
     src: "ble_gen_coin.py"
     dest: "{{ble_keykeeper_dir}}"
-    owner: pi
-    group: pi
+    owner: "{{ ble_keykeeper_user }}"
+    group: "{{ ble_keykeeper_group }}"
     mode: '0744'
 
 - name: Template main executable
   ansible.builtin.template:
     src: ble_keykeeper.py
     dest: "{{ble_keykeeper_dir}}"
-    owner: pi
-    group: pi
+    owner: "{{ ble_keykeeper_user }}"
+    group: "{{ ble_keykeeper_group }}"
     mode: '0744'
 
 - name: Template service file
   ansible.builtin.template:
     src: ble-keykeeper.service
     dest: /etc/systemd/system
-    owner: pi
-    group: pi
+    owner: "{{ ble_keykeeper_user }}"
+    group: "{{ ble_keykeeper_group }}"
     mode: '0644'
 
 - name: Make sure pip3 is installed
