@@ -29,6 +29,7 @@
     owner: root
     group: root
     mode: '0644'
+  notify: Force systemd to reread configs
 
 - name: Copy gen_coin executable
   ansible.builtin.copy:
@@ -45,6 +46,7 @@
     owner: "{{ ble_keykeeper_user }}"
     group: "{{ ble_keykeeper_group }}"
     mode: '0744'
+  notify: Restart ble-keykeeper service
 
 - name: Template service file
   ansible.builtin.template:
@@ -53,6 +55,7 @@
     owner: "{{ ble_keykeeper_user }}"
     group: "{{ ble_keykeeper_group }}"
     mode: '0644'
+  notify: Restart ble-keykeeper service
 
 - name: Make sure pip3 is installed
   apt:
@@ -64,13 +67,4 @@
 - name: Install python requirements
   pip:
     requirements: "{{ble_keykeeper_dir}}/requirements.txt"
-
-- name: Just force systemd to reread configs
-  ansible.builtin.systemd:
-    daemon_reload: yes
-
-- name: Restart ble-keykeeper service
-  ansible.builtin.systemd:
-    state: restarted
-    name: ble-keykeeper
-    enabled: yes
+  notify: Restart ble-keykeeper service
